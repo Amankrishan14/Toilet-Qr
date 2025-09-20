@@ -1,0 +1,9 @@
+# Netlify redirects for Next.js app
+# Handle client-side routing
+/*    /index.html   200
+
+# Specific routes
+/admin    /admin    200
+/qr-codes    /qr-codes    200
+/toilet/*    /toilet/:splat    200
+
