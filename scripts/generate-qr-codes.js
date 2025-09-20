@@ -7,10 +7,10 @@ const { createCanvas, loadImage } = require('canvas')
 const BASE_URL = 'http://localhost:3000'
 
 async function generateFascinoQRCode(url, toiletId) {
-  // Generate basic QR code
+  // Generate basic QR code with higher resolution
   const qrCodeDataURL = await QRCode.toDataURL(url, {
-    width: 200,
-    margin: 1,
+    width: 300,
+    margin: 2,
     color: {
       dark: '#000000',
       light: '#FFFFFF'
@@ -53,22 +53,20 @@ async function generateFascinoQRCode(url, toiletId) {
   ctx.textAlign = 'center'
   ctx.fillText('Fascino', outerX + outerSize * 0.75, outerY + outerSize * 0.25)
 
-  // Create a white circle in the center for the QR code
-  const qrSize = 180
+  // Create a white square in the center for the QR code (not circle)
+  const qrSize = 200
   const qrX = (300 - qrSize) / 2
   const qrY = (300 - qrSize) / 2
   
   ctx.fillStyle = '#FFFFFF'
-  ctx.beginPath()
-  ctx.arc(150, 150, qrSize / 2, 0, 2 * Math.PI)
-  ctx.fill()
+  ctx.fillRect(qrX, qrY, qrSize, qrSize)
 
   // Load and draw the QR code
   const qrImage = await loadImage(qrCodeDataURL)
   ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize)
 
   // Add the inner Fascino icon in the center of the QR code
-  const innerSize = 40
+  const innerSize = 50
   const innerX = 150 - innerSize / 2
   const innerY = 150 - innerSize / 2
 
@@ -88,21 +86,21 @@ async function generateFascinoQRCode(url, toiletId) {
   // Add rounded corners to inner square
   ctx.globalCompositeOperation = 'destination-in'
   ctx.beginPath()
-  ctx.roundRect(innerX, innerY, innerSize, innerSize, 6)
+  ctx.roundRect(innerX, innerY, innerSize, innerSize, 8)
   ctx.fill()
   ctx.globalCompositeOperation = 'source-over'
 
   // Add "Fascino" text in inner red quadrant
   ctx.fillStyle = '#FFFFFF'
-  ctx.font = 'bold 8px Arial'
+  ctx.font = 'bold 10px Arial'
   ctx.textAlign = 'center'
   ctx.fillText('Fascino', innerX + innerSize * 0.75, innerY + innerSize * 0.25)
 
   // Add "F" in the center
   ctx.fillStyle = '#FFFFFF'
-  ctx.font = 'bold 12px Arial'
+  ctx.font = 'bold 16px Arial'
   ctx.textAlign = 'center'
-  ctx.fillText('F', innerX + innerSize / 2, innerY + innerSize / 2 + 4)
+  ctx.fillText('F', innerX + innerSize / 2, innerY + innerSize / 2 + 5)
 
   return canvas.toBuffer('image/png')
 }
