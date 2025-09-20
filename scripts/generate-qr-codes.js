@@ -9,8 +9,8 @@ const BASE_URL = 'http://localhost:3000'
 async function generateFascinoQRCode(url, toiletId) {
   // Generate basic QR code with higher resolution
   const qrCodeDataURL = await QRCode.toDataURL(url, {
-    width: 300,
-    margin: 2,
+    width: 250,
+    margin: 1,
     color: {
       dark: '#000000',
       light: '#FFFFFF'
@@ -21,13 +21,19 @@ async function generateFascinoQRCode(url, toiletId) {
   const canvas = createCanvas(300, 300)
   const ctx = canvas.getContext('2d')
 
-  // Draw the outer app icon background (rounded square)
+  // First, draw the QR code as the base layer
+  const qrImage = await loadImage(qrCodeDataURL)
+  ctx.drawImage(qrImage, 25, 25, 250, 250)
+
+  // Now add the Fascino branding as overlays
+  // Draw the outer app icon background (rounded square) - semi-transparent
   const outerSize = 280
   const outerX = (300 - outerSize) / 2
   const outerY = (300 - outerSize) / 2
   const cornerRadius = 20
 
-  // Draw the four quadrants
+  // Draw the four quadrants with some transparency
+  ctx.globalAlpha = 0.3
   ctx.fillStyle = '#3B82F6' // Blue - top left
   ctx.fillRect(outerX, outerY, outerSize / 2, outerSize / 2)
   
@@ -46,27 +52,16 @@ async function generateFascinoQRCode(url, toiletId) {
   ctx.roundRect(outerX, outerY, outerSize, outerSize, cornerRadius)
   ctx.fill()
   ctx.globalCompositeOperation = 'source-over'
+  ctx.globalAlpha = 1.0
 
   // Add "Fascino" text in the red quadrant
   ctx.fillStyle = '#FFFFFF'
-  ctx.font = 'bold 16px Arial'
+  ctx.font = 'bold 18px Arial'
   ctx.textAlign = 'center'
   ctx.fillText('Fascino', outerX + outerSize * 0.75, outerY + outerSize * 0.25)
 
-  // Create a white square in the center for the QR code (not circle)
-  const qrSize = 200
-  const qrX = (300 - qrSize) / 2
-  const qrY = (300 - qrSize) / 2
-  
-  ctx.fillStyle = '#FFFFFF'
-  ctx.fillRect(qrX, qrY, qrSize, qrSize)
-
-  // Load and draw the QR code
-  const qrImage = await loadImage(qrCodeDataURL)
-  ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize)
-
-  // Add the inner Fascino icon in the center of the QR code
-  const innerSize = 50
+  // Add a small Fascino logo in the center (smaller so it doesn't interfere with QR)
+  const innerSize = 30
   const innerX = 150 - innerSize / 2
   const innerY = 150 - innerSize / 2
 
@@ -86,21 +81,15 @@ async function generateFascinoQRCode(url, toiletId) {
   // Add rounded corners to inner square
   ctx.globalCompositeOperation = 'destination-in'
   ctx.beginPath()
-  ctx.roundRect(innerX, innerY, innerSize, innerSize, 8)
+  ctx.roundRect(innerX, innerY, innerSize, innerSize, 6)
   ctx.fill()
   ctx.globalCompositeOperation = 'source-over'
 
-  // Add "Fascino" text in inner red quadrant
-  ctx.fillStyle = '#FFFFFF'
-  ctx.font = 'bold 10px Arial'
-  ctx.textAlign = 'center'
-  ctx.fillText('Fascino', innerX + innerSize * 0.75, innerY + innerSize * 0.25)
-
   // Add "F" in the center
   ctx.fillStyle = '#FFFFFF'
-  ctx.font = 'bold 16px Arial'
+  ctx.font = 'bold 12px Arial'
   ctx.textAlign = 'center'
-  ctx.fillText('F', innerX + innerSize / 2, innerY + innerSize / 2 + 5)
+  ctx.fillText('F', innerX + innerSize / 2, innerY + innerSize / 2 + 3)
 
   return canvas.toBuffer('image/png')
 }
