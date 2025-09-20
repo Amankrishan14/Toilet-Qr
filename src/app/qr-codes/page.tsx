@@ -5,7 +5,7 @@ export default function QRCodesPage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Toilet QR Codes</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            All QR codes for the toilet feedback system. Each QR code links to a specific toilet's feedback form.
+            All QR codes for the toilet feedback system. Each QR code links to a specific toilet&apos;s feedback form.
           </p>
         </div>
 

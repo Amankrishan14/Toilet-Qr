@@ -3,9 +3,9 @@ import FeedbackForm from '@/components/FeedbackForm'
 import { notFound } from 'next/navigation'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 async function getToilet(id: string) {
@@ -23,7 +23,8 @@ async function getToilet(id: string) {
 }
 
 export default async function ToiletPage({ params }: PageProps) {
-  const toilet = await getToilet(params.id)
+  const { id } = await params
+  const toilet = await getToilet(id)
 
   if (!toilet) {
     notFound()

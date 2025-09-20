@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                           {feedback.toilet_id}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {(feedback as any).toilets?.location}
+                          {(feedback as { toilets?: { location: string } }).toilets?.location}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

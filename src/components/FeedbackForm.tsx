@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase, Feedback } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 interface FeedbackFormProps {
   toiletId: string
@@ -25,7 +25,7 @@ export default function FeedbackForm({ toiletId, toiletName }: FeedbackFormProps
     setError('')
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('feedbacks')
         .insert([
           {
