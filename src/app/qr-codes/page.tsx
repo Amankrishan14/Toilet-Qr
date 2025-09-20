@@ -1,3 +1,5 @@
+'use client'
+
 export default function QRCodesPage() {
   return (
     <div className="min-h-screen bg-gray-100">
@@ -20,11 +22,12 @@ export default function QRCodesPage() {
                 <h3 className="font-semibold text-gray-800 mb-2">
                   {toiletId.replace('_', ' ').toUpperCase()}
                 </h3>
-                <div className="w-32 h-32 bg-gray-200 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                  <div className="text-gray-500 text-sm text-center">
-                    QR Code<br />
-                    <span className="text-xs">300x300px</span>
-                  </div>
+                <div className="w-32 h-32 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                  <img 
+                    src={`/qr-codes/${toiletId}_qr.png`}
+                    alt={`QR Code for ${toiletId}`}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
                 </div>
                 <p className="text-xs text-gray-500 mb-2">
                   Building {building} - {floor}

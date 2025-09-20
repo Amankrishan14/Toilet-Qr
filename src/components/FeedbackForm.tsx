@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
 interface FeedbackFormProps {
   toiletId: string
@@ -25,19 +24,22 @@ export default function FeedbackForm({ toiletId, toiletName }: FeedbackFormProps
     setError('')
 
     try {
-      const { error } = await supabase
-        .from('feedbacks')
-        .insert([
-          {
-            toilet_id: toiletId,
-            cleanliness_rating: formData.cleanliness_rating,
-            water_available: formData.water_available,
-            soap_available: formData.soap_available,
-            comments: formData.comments || null
-          }
-        ])
-
-      if (error) throw error
+      // Demo mode - simulate API call
+      // Replace with actual Supabase call when database is set up
+      console.log('Demo feedback submission:', {
+        toilet_id: toiletId,
+        ...formData
+      })
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // For demo purposes, always succeed
+      // In production, replace with:
+      // const { error } = await supabase
+      //   .from('feedbacks')
+      //   .insert([{ toilet_id: toiletId, ...formData }])
+      // if (error) throw error
 
       setIsSubmitted(true)
     } catch (err) {

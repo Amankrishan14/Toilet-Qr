@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase, Feedback } from '@/lib/supabase'
+import { Feedback } from '@/lib/supabase'
 
 export default function AdminDashboard() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
@@ -17,19 +17,24 @@ export default function AdminDashboard() {
   const fetchFeedbacks = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('feedbacks')
-        .select(`
-          *,
-          toilets (
-            name,
-            location
-          )
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setFeedbacks(data || [])
+      
+      // Demo mode - return empty array
+      // Replace with Supabase query when database is set up
+      console.log('Demo: Fetching feedbacks from Supabase...')
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // For demo purposes, return empty array
+      // In production, replace with:
+      // const { data, error } = await supabase
+      //   .from('feedbacks')
+      //   .select(`*, toilets (name, location)`)
+      //   .order('created_at', { ascending: false })
+      // if (error) throw error
+      // setFeedbacks(data || [])
+      
+      setFeedbacks([])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch feedbacks')
     } finally {
