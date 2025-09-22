@@ -1,3 +1,4 @@
+import { supabase } from '@/lib/supabase'
 import FeedbackForm from '@/components/FeedbackForm'
 import { notFound } from 'next/navigation'
 
@@ -7,23 +8,19 @@ interface PageProps {
   }>
 }
 
-// Demo toilet data - replace with Supabase when ready
-const demoToilets = Array.from({ length: 50 }, (_, i) => ({
-  id: `toilet_${i + 1}`,
-  name: `Toilet ${i + 1}`,
-  location: `Building ${String.fromCharCode(65 + Math.floor(i / 3))} - ${['Ground Floor', 'First Floor', 'Second Floor'][i % 3]}`
-}))
-
 async function getToilet(id: string) {
-  // For demo purposes, return demo data
-  // Replace this with Supabase query when database is set up
-  const toilet = demoToilets.find(t => t.id === id)
-  
-  if (!toilet) {
+  const { data, error } = await supabase
+    .from('toilets')
+    .select('*')
+    .eq('id', id)
+    .eq('is_active', true)
+    .single()
+
+  if (error || !data) {
     return null
   }
 
-  return toilet
+  return data
 }
 
 export default async function ToiletPage({ params }: PageProps) {
@@ -43,8 +40,12 @@ export default async function ToiletPage({ params }: PageProps) {
 }
 
 export async function generateStaticParams() {
-  // Return demo toilet IDs for static generation
-  return demoToilets.map((toilet) => ({
+  const { data: toilets } = await supabase
+    .from('toilets')
+    .select('id')
+    .eq('is_active', true)
+
+  return toilets?.map((toilet) => ({
     id: toilet.id,
-  }))
+  })) || []
 }

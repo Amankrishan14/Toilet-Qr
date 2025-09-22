@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 interface FeedbackFormProps {
   toiletId: string
@@ -30,36 +31,72 @@ export default function FeedbackForm({ toiletId, toiletName }: FeedbackFormProps
     setError('')
 
     try {
-      // Demo mode - simulate API call
-      // Replace with actual Supabase call when database is set up
-      console.log('Demo feedback submission:', {
-        toilet_id: toiletId,
-        cleanliness_rating: formData.cleanliness_rating,
-        water_available: formData.water_available,
-        soap_available: formData.soap_available,
-        comments: formData.comments,
-        name: formData.name,
-        mobile: formData.mobile,
-        extra_feedback: formData.extra_feedback,
-        photos_count: formData.photos.length,
-        videos_count: formData.videos.length,
-        photo_files: formData.photos.map(f => f.name),
-        video_files: formData.videos.map(f => f.name)
-      })
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // For demo purposes, always succeed
-      // In production, replace with:
-      // const { error } = await supabase
-      //   .from('feedbacks')
-      //   .insert([{ toilet_id: toiletId, ...formData }])
-      // if (error) throw error
+      // Upload files to Supabase Storage (if any)
+      const photoUrls: string[] = []
+      const videoUrls: string[] = []
+
+      // Upload photos
+      for (const photo of formData.photos) {
+        const fileExt = photo.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+        const filePath = `feedback-photos/${toiletId}/${fileName}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('feedback-media')
+          .upload(filePath, photo)
+        
+        if (uploadError) throw uploadError
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('feedback-media')
+          .getPublicUrl(filePath)
+        
+        photoUrls.push(publicUrl)
+      }
+
+      // Upload videos
+      for (const video of formData.videos) {
+        const fileExt = video.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+        const filePath = `feedback-videos/${toiletId}/${fileName}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('feedback-media')
+          .upload(filePath, video)
+        
+        if (uploadError) throw uploadError
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('feedback-media')
+          .getPublicUrl(filePath)
+        
+        videoUrls.push(publicUrl)
+      }
+
+      // Submit feedback to database
+      const { error } = await supabase
+        .from('feedbacks')
+        .insert([{
+          toilet_id: toiletId,
+          cleanliness_rating: formData.cleanliness_rating,
+          water_available: formData.water_available,
+          soap_available: formData.soap_available,
+          comments: formData.comments || null,
+          name: formData.name || null,
+          mobile: formData.mobile || null,
+          extra_feedback: formData.extra_feedback || null,
+          photos: photoUrls,
+          videos: videoUrls,
+          ip_address: null, // Will be set by database trigger if needed
+          user_agent: navigator.userAgent
+        }])
+
+      if (error) throw error
 
       setIsSubmitted(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Feedback submission error:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred while submitting feedback')
     } finally {
       setIsSubmitting(false)
     }
